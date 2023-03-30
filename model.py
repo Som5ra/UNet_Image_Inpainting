@@ -65,7 +65,6 @@ class DecoderBlockV2(nn.Module):
     
 class UResNet(nn.Module):
 
-
     def __init__(self, encoder_depth, num_classes, num_filters=32, dropout_2d=0.2,
                  pretrained=False, is_deconv=False):
         super().__init__()
