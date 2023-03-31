@@ -2,7 +2,9 @@
 # Edit at https://www.toptal.com/developers/gitignore?templates=python,visualstudiocode
 
 
-data/
+data/img_align_celeba_218_178
+data/img_align_celeba_256
+data/qd_img
 weights/
 
 ### Python ###
