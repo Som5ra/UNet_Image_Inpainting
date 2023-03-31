@@ -33,19 +33,20 @@ class Love_coco_dataset(Dataset):
         syn_image = torch.from_numpy(syn_image).float().div(255).cuda()
         image = image.permute(2, 0, 1)
         syn_image = syn_image.permute(2, 0, 1)
-        return image, syn_image
+        return syn_image, image
     
     def __len__(self):
         return len(self.image_mask_pairs)
 
     def load_data(self):
+        log(f"loading data from {self.img_dir} and {self.syn_path}...")
         pairs = []
-        for i in tqdm(range(len(self.image_list[:20]))):
+        for i in tqdm(range(len(self.image_list))):
             true_idx = self.image_list[i].split('.')[0]
             image = np.ascontiguousarray(cv2.imread(os.path.join(self.img_dir, true_idx + self.image_type))[:, :, ::-1])
             syn_image = np.ascontiguousarray(cv2.imread(os.path.join(self.syn_path, true_idx + self.mask_type))[:, :, ::-1])
             pairs.append((np.ascontiguousarray(image), syn_image))
-
+        log(f"loading data finished with {len(pairs)} image mask pairs.")
         return pairs
     
 if __name__ == '__main__':

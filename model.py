@@ -4,7 +4,6 @@ import torch
 from torchvision import models
 import torchvision
 
-input_size = (448, 448)
 
 class Interpolate(nn.Module):
     def __init__(self, size=None, scale_factor=None, mode='nearest', align_corners=False):
@@ -42,10 +41,6 @@ class DecoderBlockV2(nn.Module):
         self.in_channels = in_channels
 
         if is_deconv:
-            """
-                Paramaters for Deconvolution were chosen to avoid artifacts, following
-                link https://distill.pub/2016/deconv-checkerboard/
-            """
 
             self.block = nn.Sequential(
                 ConvRelu(in_channels, middle_channels),
@@ -61,14 +56,15 @@ class DecoderBlockV2(nn.Module):
             )
 
     def forward(self, x):
-        return self.block(x)
+        x = self.block(x)
+        return x
     
 class UResNet(nn.Module):
 
-    def __init__(self, encoder_depth, num_classes, num_filters=32, dropout_2d=0.2,
+    def __init__(self, encoder_depth, output_channels, num_filters=32, dropout_2d=0.2,
                  pretrained=False, is_deconv=False):
         super().__init__()
-        self.num_classes = num_classes
+        self.output_channels = output_channels
         self.dropout_2d = dropout_2d
 
         if encoder_depth == 34:
@@ -110,7 +106,7 @@ class UResNet(nn.Module):
                                    is_deconv)
         self.dec1 = DecoderBlockV2(num_filters * 2 * 2, num_filters * 2 * 2, num_filters, is_deconv)
         self.dec0 = ConvRelu(num_filters, num_filters)
-        self.final = nn.Conv2d(num_filters, num_classes, kernel_size=1)
+        self.final = nn.Conv2d(num_filters, output_channels, kernel_size=1)
 
     def forward(self, x):
         conv1 = self.conv1(x)
@@ -130,22 +126,27 @@ class UResNet(nn.Module):
         dec1 = self.dec1(dec2)
         dec0 = self.dec0(dec1)
 
-        return self.final(F.dropout2d(dec0, p=self.dropout_2d))
+        output = self.final(F.dropout2d(dec0, p=self.dropout_2d))
+        return output
     
+
+
 
 # Test UResNet
 if __name__ == '__main__':
-    model = UResNet(34, 1, num_filters=16, pretrained=True)
-    print(model)
-
-    # Test forward
-    x = torch.rand(1, 3, 448, 448)
+    model = UResNet(34, 3, num_filters=16, pretrained=True)
+    x = torch.rand(1, 3, 256, 256)
     y = model(x)
-    print(y.shape)
+    # print(model)
 
-    # Test backward
-    loss = nn.BCEWithLogitsLoss()
-    y = loss(y, torch.rand(1, 1, 448, 448))
-    y.backward()
+    # # Test forward
+    # x = torch.rand(1, 3, 448, 448)
+    # y = model(x)
+    # print(y.shape)
 
-    print('Done')
+    # # Test backward
+    # loss = nn.BCEWithLogitsLoss()
+    # y = loss(y, torch.rand(1, 1, 448, 448))
+    # y.backward()
+
+    # print('Done')

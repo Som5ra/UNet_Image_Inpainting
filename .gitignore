@@ -3,6 +3,7 @@
 
 
 data/
+weights/
 
 ### Python ###
 # Byte-compiled / optimized / DLL files
