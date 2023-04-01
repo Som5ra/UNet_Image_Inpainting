@@ -41,7 +41,7 @@ class Love_coco_dataset(Dataset):
     def load_data(self):
         log(f"loading data from {self.img_dir} and {self.syn_path}...")
         pairs = []
-        for i in tqdm(range(len(self.image_list))):
+        for i in tqdm(range(len(self.image_list[: 20000]))):
             true_idx = self.image_list[i].split('.')[0]
             image = np.ascontiguousarray(cv2.imread(os.path.join(self.img_dir, true_idx + self.image_type))[:, :, ::-1])
             syn_image = np.ascontiguousarray(cv2.imread(os.path.join(self.syn_path, true_idx + self.mask_type))[:, :, ::-1])
