@@ -19,4 +19,4 @@
 Not implemented yet.
 
 ## 2023.03.20 01:35:
-1. Start VcXsrv first, and then use plt since wsl does't support opencv?
+1. Start VcXsrv first, and then use plt since wsl does't support original opencv window display.
